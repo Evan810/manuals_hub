@@ -4,7 +4,7 @@ class AppRoutes {
 
   // 手册列表页真实路径。
   static const manuals = "/manuals";
-  
+
   // 手册详情页路由模板，`:id` 是路径参数占位符。
   static const chaptersList = "/manuals/:id";
 
