@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../features/app/pages/application.dart';
+import '../../features/application.dart';
 import '../../features/manuals/pages/manuals_chapter_page.dart';
 import '../../features/manuals/pages/manuals_list_page.dart';
 import 'app_routes.dart';
@@ -21,7 +21,7 @@ GoRouter appRouter(Ref ref) {
       // / -> 应用首页
       GoRoute(
         path: AppRoutes.home,
-        builder: (_, _) => const HomePage(),
+        builder: (_, _) => const Application(),
       ),
       // /manuals -> 新闻列表页
       GoRoute(

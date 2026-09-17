@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manuals_hub/core/router/app_routes.dart';
 
-import '../../../core/router/app_routes.dart';
+
 
 class ManualsListPage extends StatelessWidget {
   const ManualsListPage({super.key});

@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 
-import '../model/model.dart';
+import 'app/pages/models.dart';
 
 
-class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+class Application extends StatefulWidget {
+  const Application({super.key});
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<Application> createState() => _ApplicationState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _ApplicationState extends State<Application> {
   int _selectedIndex = 0;
 
   static const _titles = ['主页', '锦囊妙计', '工具', '我的'];
@@ -35,10 +35,10 @@ class _HomePageState extends State<HomePage> {
       body: IndexedStack(
         index: _selectedIndex,
         children: const [
-          HomeContent(),
-          TipsContent(),
-          ToolsContent(),
-          ProfileContent(),
+          HomePage(),
+          PackagesPage(),
+          ToolsPage(),
+          AccountPage(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
