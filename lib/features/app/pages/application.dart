@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../model/model.dart';
+import 'model.dart';
 
 
 class HomePage extends StatefulWidget {
