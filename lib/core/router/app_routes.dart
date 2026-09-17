@@ -2,6 +2,9 @@
 class AppRoutes {
   const AppRoutes._();
 
+  // 应用首页路径。
+  static const home = "/";
+
   // 手册列表页真实路径。
   static const manuals = "/manuals";
 
