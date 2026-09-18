@@ -59,7 +59,7 @@ class _PlaceholderContent extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             FilledButton.icon(
-              onPressed: () => context.push(AppRoutes.manuals),
+              onPressed: () => context.push(AppRoutes.categoryList),
               icon: const Icon(Icons.menu_book_rounded),
               label: Text(actionLabel),
             ),

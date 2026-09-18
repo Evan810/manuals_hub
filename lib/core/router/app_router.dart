@@ -5,8 +5,6 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '/features/app_route.dart';
 
 import '../../features/zkcd/views/zkcd_menu_page.dart';
-import '../../features/app/views/account/account_info_page.dart';
-import '../../features/app/views/account/account_settings_page.dart';
 
 // 这一行必须写，build_runner 会根据它生成 app_router.g.dart。
 part 'app_router.g.dart';
@@ -22,29 +20,43 @@ GoRouter appRouter(Ref ref) {
     routes: [
       // /home -> 应用首页
       GoRoute(path: AppRoutes.home, builder: (_, _) => const Application()),
+
       // / -> ZKCD 功能菜单（复刻截图 UI）
       GoRoute(
         path: AppRoutes.zkcdMenu,
         builder: (_, _) => const ZkcdMenuPage(),
       ),
-      // /manuals -> 新闻列表页
+
+      // /categoryList -> 分类列表页
       GoRoute(
-        path: AppRoutes.manuals,
-        builder: (_, _) => const ManualsListPage(),
+        path: AppRoutes.categoryList,
+        builder: (_, _) => const CategoryListPage(),
       ),
-      // /manuals/:id -> 新闻详情页
+
+      //GoRoute 传递两个参数，使用 `extra` 传对象是处理 ID 和中文 title
       GoRoute(
         path: AppRoutes.chaptersList,
         builder: (_, state) {
-          // 从路径参数中读取 id，例如 /manuals/article_001 中的 article_001。
           final id = state.pathParameters['id']!;
-          return ManualsChapterPage(manualsId: id);
+          final extra = state.extra;
+          final title = extra is ChapterArgs ? extra.title : '手册章节目录';
+
+          return ChapterPage(
+            args: ChapterArgs(id: id, title: title),
+          );
         },
       ),
+
+      GoRoute(
+        path: AppRoutes.accountPage,
+        builder: (_, _) => const AccountPage(),
+      ),
+
       GoRoute(
         path: AppRoutes.accountSettings,
         builder: (_, _) => const AccountSettingsPage(),
       ),
+
       GoRoute(
         path: AppRoutes.disclaimer,
         builder: (_, _) => const AccountInfoPage(
@@ -52,6 +64,7 @@ GoRouter appRouter(Ref ref) {
           body: '本应用提供的内容仅用于学习和信息参考。实际操作前请遵守设备制造商的技术规范、安全规程和现场管理要求。因使用本应用内容产生的任何后果，请以经过确认的专业资料和现场判断为准。',
         ),
       ),
+      
       GoRoute(
         path: AppRoutes.about,
         builder: (_, _) => const AccountInfoPage(

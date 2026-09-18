@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:manuals_hub/features/app/models/home/hmcategory.dart';
-import 'package:manuals_hub/features/app/models/home/hmappbar.dart';
+import 'package:manuals_hub/features/app/models/home/until_appbar.dart';
 import 'package:manuals_hub/features/app/models/home/hmwidget.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  const HomePage({super.key, required this.onAccountTap});
+
+  final VoidCallback onAccountTap;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -17,8 +19,13 @@ class _HomePageState extends State<HomePage> {
     return [
       SliverPersistentHeader(
         pinned: true,
-        delegate: _HmAppbarDelegate(topPadding: topPadding),
+        delegate: HmAppbar(
+          topPadding: topPadding,
+          title: '电梯工具手册集',
+          onAccount: widget.onAccountTap,
+        ),
       ),
+      SliverPersistentHeader(pinned: true, delegate: _HmCategoryDelegate()),
       SliverToBoxAdapter(child: SizedBox(height: 10)),
       HmWidget(),
     ];
@@ -30,16 +37,12 @@ class _HomePageState extends State<HomePage> {
   }
 }
 
-class _HmAppbarDelegate extends SliverPersistentHeaderDelegate {
-  _HmAppbarDelegate({required this.topPadding});
-
-  final double topPadding;
+class _HmCategoryDelegate extends SliverPersistentHeaderDelegate {
+  @override
+  double get minExtent => 40;
 
   @override
-  double get minExtent => topPadding + 64 + 40;
-
-  @override
-  double get maxExtent => topPadding + 64 + 40;
+  double get maxExtent => 40;
 
   @override
   Widget build(
@@ -49,16 +52,10 @@ class _HmAppbarDelegate extends SliverPersistentHeaderDelegate {
   ) {
     return ColoredBox(
       color: Theme.of(context).colorScheme.surface,
-      child: Column(
-        children: [
-          HmAppbar(topPadding: topPadding),
-          const HmCategory(),
-        ],
-      ),
+      child: const HmCategory(),
     );
   }
 
   @override
-  bool shouldRebuild(covariant _HmAppbarDelegate oldDelegate) =>
-      oldDelegate.topPadding != topPadding;
+  bool shouldRebuild(covariant _HmCategoryDelegate oldDelegate) => false;
 }

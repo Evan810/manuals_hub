@@ -28,10 +28,19 @@ class ManualsHeaderDelegate extends SliverPersistentHeaderDelegate {
     double shrinkOffset,
     bool overlapsContent,
   ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // 深色模式下品牌蓝压暗 25%，避免刺眼
+    final startColor = isDark
+        ? Color.lerp(AppColors.primaryBlue, Colors.black, 0.25)!
+        : AppColors.primaryBlue;
+    final endColor = isDark
+        ? Color.lerp(AppColors.primaryBlueDark, Colors.black, 0.25)!
+        : AppColors.primaryBlueDark;
+
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [AppColors.primaryBlue, AppColors.primaryBlueDark],
+          colors: [startColor, endColor],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),

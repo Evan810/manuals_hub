@@ -18,11 +18,11 @@ class _ApplicationState extends State<Application> {
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
-        children: const [
-          HomePage(),
+        children: [
+          HomePage(onAccountTap: () => setState(() => _selectedIndex = 3)),
           PackagesPage(),
           ToolsPage(),
-          AccountPage(),
+          const AccountPage(),
         ],
       ),
       bottomNavigationBar: NavigationBar(

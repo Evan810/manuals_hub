@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manuals_hub/core/core.dart';
 import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
 
-class ManualsChapterPage extends StatelessWidget {
-  const ManualsChapterPage({super.key, required this.manualsId});
+class ChapterPage extends StatelessWidget {
+  const ChapterPage({super.key, required this.args});
 
-  // 从路由参数中传进来的新闻 id。
-  final String manualsId;
+  // id 来自 URL，title 来自 go_router 的 extra。
+  final ChapterArgs args;
 
   @override
   Widget build(BuildContext context) {
@@ -19,14 +20,14 @@ class ManualsChapterPage extends StatelessWidget {
             pinned: true,
             delegate: ManualsHeaderDelegate(
               topPadding: topPadding,
-              title: "手册-$manualsId",
+              title: (args.title),
               onBack: () => context.pop(),
             ),
           ),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             sliver: SliverList.list(
-              children: [
+              children: [                             
                 _ChapterCard(title: '当前手册', onTap: () {}),
                 _ChapterCard(title: '第一章：基础介绍', onTap: () {}),
                 _ChapterCard(title: '第二章：运行状态', onTap: () {}),

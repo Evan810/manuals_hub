@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:manuals_hub/core/core.dart';
 import 'package:manuals_hub/core/router/app_routes.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
 import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
 
-class ManualsListPage extends StatelessWidget {
-  const ManualsListPage({super.key});
+class CategoryListPage extends StatelessWidget {
+  const CategoryListPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.paddingOf(context).top;
+
     final manuals = [
       (
         id: 'article_001',
@@ -47,15 +49,17 @@ class ManualsListPage extends StatelessWidget {
             sliver: SliverList.builder(
               itemCount: manuals.length,
               itemBuilder: (context, index) {
-                final manual = manuals[index];
+                final chapter = manuals[index];
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 10),
                   child: _ManualCard(
-                    title: manual.title,
-                    subtitle: manual.subtitle,
-                    chapterCount: manual.chapterCount,
-                    onTap: () =>
-                        context.push(AppRoutes.chaptersPath(manual.id)),
+                    title: chapter.title,
+                    subtitle: chapter.subtitle,
+                    chapterCount: chapter.chapterCount,
+                    onTap: () => context.push(
+                      AppRoutes.chaptersPath(chapter.id),
+                      extra: ChapterArgs(id: chapter.id, title: chapter.title),
+                    ),
                   ),
                 );
               },

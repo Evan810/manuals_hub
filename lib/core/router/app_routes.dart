@@ -1,4 +1,5 @@
 // 集中管理路由路径，避免页面里到处手写字符串。
+
 class AppRoutes {
   const AppRoutes._();
 
@@ -9,16 +10,25 @@ class AppRoutes {
   static const home = "/home";
 
   // 手册列表页真实路径。
-  static const manuals = "/manuals";
+  static const categoryList = "/CategoryList";
 
   // 手册详情页路由模板，`:id` 是路径参数占位符。
-  static const chaptersList = "/manuals/:id";
+  static const chaptersList = "/CategoryList/:id";
 
   // 我的页面子页面。
+  static const accountPage = "/account/accountpage";
   static const accountSettings = "/account/settings";
   static const disclaimer = "/account/disclaimer";
   static const about = "/account/about";
 
   //  根据手册 id 生成真正用于跳转的路径。
-  static String chaptersPath(String id) => '/manuals/$id';
+  static String chaptersPath(String id) => '/CategoryList/$id';
+}
+
+/// 章节页路由参数：id 进入 URL，title 通过 GoRouter.extra 传递。
+class ChapterArgs {
+  const ChapterArgs({required this.id, required this.title});
+
+  final String id;
+  final String title;
 }
