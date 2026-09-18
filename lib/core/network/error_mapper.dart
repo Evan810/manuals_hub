@@ -6,7 +6,6 @@ import 'api_exception.dart';
 
 // 这样 UI 和 Provider 层只处理一种错误模型，不直接依赖 Dio 细节。
 ApiException mapNetworkError(Object error) {
-  
   // 已经是业务异常时直接透传，避免重复包装。
   if (error is ApiException) {
     return error;

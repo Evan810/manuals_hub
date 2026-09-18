@@ -27,21 +27,10 @@ class ManualsChapterPage extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
             sliver: SliverList.list(
               children: [
-                _ChapterCard(
-                  title: '当前手册', 
-                  onTap: () {}),
-                _ChapterCard(
-                  title: '第一章：基础介绍',                  
-                  onTap: () {},
-                ),
-                _ChapterCard(
-                  title: '第二章：运行状态',                  
-                  onTap: () {},
-                ),
-                _ChapterCard(
-                  title: '第三章：故障处理',                  
-                  onTap: () {},
-                ),
+                _ChapterCard(title: '当前手册', onTap: () {}),
+                _ChapterCard(title: '第一章：基础介绍', onTap: () {}),
+                _ChapterCard(title: '第二章：运行状态', onTap: () {}),
+                _ChapterCard(title: '第三章：故障处理', onTap: () {}),
               ],
             ),
           ),
@@ -52,10 +41,7 @@ class ManualsChapterPage extends StatelessWidget {
 }
 
 class _ChapterCard extends StatelessWidget {
-  const _ChapterCard({
-    required this.title,
-    required this.onTap, 
-  });
+  const _ChapterCard({required this.title, required this.onTap});
 
   final String title;
   final VoidCallback onTap;

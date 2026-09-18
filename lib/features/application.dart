@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
 
-import 'app/models.dart';
+import 'app/app.dart';
 
 class Application extends StatefulWidget {
   const Application({super.key});

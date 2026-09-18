@@ -14,6 +14,11 @@ class AppRoutes {
   // 手册详情页路由模板，`:id` 是路径参数占位符。
   static const chaptersList = "/manuals/:id";
 
+  // 我的页面子页面。
+  static const accountSettings = "/account/settings";
+  static const disclaimer = "/account/disclaimer";
+  static const about = "/account/about";
+
   //  根据手册 id 生成真正用于跳转的路径。
   static String chaptersPath(String id) => '/manuals/$id';
 }

@@ -109,11 +109,19 @@ class AppThemePalette {
   static AppThemePalette of(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     return AppThemePalette._(
-      pageBackground: isDark ? _DarkPalette.pageBackground : _LightPalette.pageBackground,
-      cardBackground: isDark ? _DarkPalette.cardBackground : _LightPalette.cardBackground,
+      pageBackground: isDark
+          ? _DarkPalette.pageBackground
+          : _LightPalette.pageBackground,
+      cardBackground: isDark
+          ? _DarkPalette.cardBackground
+          : _LightPalette.cardBackground,
       cardBorder: isDark ? _DarkPalette.cardBorder : _LightPalette.cardBorder,
-      textPrimary: isDark ? _DarkPalette.textPrimary : _LightPalette.textPrimary,
-      textSecondary: isDark ? _DarkPalette.textSecondary : _LightPalette.textSecondary,
+      textPrimary: isDark
+          ? _DarkPalette.textPrimary
+          : _LightPalette.textPrimary,
+      textSecondary: isDark
+          ? _DarkPalette.textSecondary
+          : _LightPalette.textSecondary,
     );
   }
 }

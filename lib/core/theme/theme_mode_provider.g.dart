@@ -18,11 +18,11 @@ part of 'theme_mode_provider.dart';
 /// 用法：
 /// ```dart
 /// // 读取当前模式
-/// final mode = ref.watch(themeModeNotifierProvider);
+/// final mode = ref.watch(themeModeProvider);
 ///
 /// // 切换模式
-/// ref.read(themeModeNotifierProvider.notifier).setDark();
-/// ref.read(themeModeNotifierProvider.notifier).cycle();
+/// ref.read(themeModeProvider.notifier).setDark();
+/// ref.read(themeModeProvider.notifier).cycle();
 /// ```
 ///
 /// 注意：[SharedPreferences] 必须在 `main()` 中预先加载，
@@ -41,11 +41,11 @@ final themeModeProvider = ThemeModeNotifierProvider._();
 /// 用法：
 /// ```dart
 /// // 读取当前模式
-/// final mode = ref.watch(themeModeNotifierProvider);
+/// final mode = ref.watch(themeModeProvider);
 ///
 /// // 切换模式
-/// ref.read(themeModeNotifierProvider.notifier).setDark();
-/// ref.read(themeModeNotifierProvider.notifier).cycle();
+/// ref.read(themeModeProvider.notifier).setDark();
+/// ref.read(themeModeProvider.notifier).cycle();
 /// ```
 ///
 /// 注意：[SharedPreferences] 必须在 `main()` 中预先加载，
@@ -62,11 +62,11 @@ final class ThemeModeNotifierProvider
   /// 用法：
   /// ```dart
   /// // 读取当前模式
-  /// final mode = ref.watch(themeModeNotifierProvider);
+  /// final mode = ref.watch(themeModeProvider);
   ///
   /// // 切换模式
-  /// ref.read(themeModeNotifierProvider.notifier).setDark();
-  /// ref.read(themeModeNotifierProvider.notifier).cycle();
+  /// ref.read(themeModeProvider.notifier).setDark();
+  /// ref.read(themeModeProvider.notifier).cycle();
   /// ```
   ///
   /// 注意：[SharedPreferences] 必须在 `main()` 中预先加载，
@@ -110,11 +110,11 @@ String _$themeModeNotifierHash() => r'90029b93f2a03fdfaee97cfd8024e0ecfaa66ecf';
 /// 用法：
 /// ```dart
 /// // 读取当前模式
-/// final mode = ref.watch(themeModeNotifierProvider);
+/// final mode = ref.watch(themeModeProvider);
 ///
 /// // 切换模式
-/// ref.read(themeModeNotifierProvider.notifier).setDark();
-/// ref.read(themeModeNotifierProvider.notifier).cycle();
+/// ref.read(themeModeProvider.notifier).setDark();
+/// ref.read(themeModeProvider.notifier).cycle();
 /// ```
 ///
 /// 注意：[SharedPreferences] 必须在 `main()` 中预先加载，

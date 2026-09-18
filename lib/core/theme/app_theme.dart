@@ -71,15 +71,39 @@ class AppTheme {
 
   static TextTheme _buildTextTheme(AppThemePalette palette) {
     return TextTheme(
-      displayLarge: TextStyle(color: palette.textPrimary, fontSize: 32, fontWeight: FontWeight.w700),
-      displayMedium: TextStyle(color: palette.textPrimary, fontSize: 28, fontWeight: FontWeight.w700),
-      titleLarge: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.w600),
-      titleMedium: TextStyle(color: palette.textPrimary, fontSize: 16, fontWeight: FontWeight.w600),
-      titleSmall: TextStyle(color: palette.textPrimary, fontSize: 14, fontWeight: FontWeight.w600),
+      displayLarge: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+      ),
+      displayMedium: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 28,
+        fontWeight: FontWeight.w700,
+      ),
+      titleLarge: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 20,
+        fontWeight: FontWeight.w600,
+      ),
+      titleMedium: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+      ),
+      titleSmall: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+      ),
       bodyLarge: TextStyle(color: palette.textPrimary, fontSize: 16),
       bodyMedium: TextStyle(color: palette.textPrimary, fontSize: 14),
       bodySmall: TextStyle(color: palette.textSecondary, fontSize: 12),
-      labelLarge: TextStyle(color: palette.textPrimary, fontSize: 14, fontWeight: FontWeight.w500),
+      labelLarge: TextStyle(
+        color: palette.textPrimary,
+        fontSize: 14,
+        fontWeight: FontWeight.w500,
+      ),
       labelMedium: TextStyle(color: palette.textSecondary, fontSize: 12),
     );
   }

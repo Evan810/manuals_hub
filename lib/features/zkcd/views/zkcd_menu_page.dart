@@ -76,7 +76,10 @@ class ZkcdMenuPage extends StatelessWidget {
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: const LinearGradient(
-          colors: [AppColors.featureCardPurpleLight, AppColors.featureCardPurple],
+          colors: [
+            AppColors.featureCardPurpleLight,
+            AppColors.featureCardPurple,
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -102,10 +105,7 @@ class ZkcdMenuPage extends StatelessWidget {
           SizedBox(height: 6),
           Text(
             '请选择要进入的功能',
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
+            style: TextStyle(color: Colors.white70, fontSize: 14),
           ),
         ],
       ),
@@ -114,63 +114,65 @@ class ZkcdMenuPage extends StatelessWidget {
 
   // ==================== 菜单项数据 ====================
   List<_MenuItemData> get _menuItems => [
-        _MenuItemData(
-          label: '电梯',
-          title: '电梯状态',
-          subtitle: '电梯楼层与运行状态',
-          bgColor: AppColors.iconElevator,
-        ),
-        _MenuItemData(
-          label: '故障',
-          title: '故障',
-          subtitle: '查看当前/NS 故障信息',
-          bgColor: AppColors.iconFault,
-        ),
-        _MenuItemData(
-          label: 'IO',
-          title: 'I/O 查看',
-          subtitle: '井道/机房/门信号状态查询',
-          bgColor: AppColors.iconIO,
-        ),
-        _MenuItemData(
-          label: 'HMI',
-          title: 'HMI',
-          subtitle: 'HMI 打开/关闭控制',
-          bgColor: AppColors.iconHMI,
-        ),
-        _MenuItemData(
-          label: '印板',
-          title: '印板验证',
-          subtitle: '印板验证功能',
-          bgColor: AppColors.iconPCB,
-        ),
-        _MenuItemData(
-          label: '参数',
-          title: '参数修改',
-          subtitle: 'NV 参数读取与修改',
-          bgColor: AppColors.iconParam,
-        ),
-        _MenuItemData(
-          label: '程序',
-          title: '程序信息',
-          subtitle: '查看各版本程序信息',
-          bgColor: AppColors.iconProgram,
-        ),
-        _MenuItemData(
-          label: '时钟',
-          title: '系统时钟',
-          subtitle: '电梯时钟读取与设置',
-          bgColor: AppColors.iconClock,
-        ),
-      ];
+    _MenuItemData(
+      label: '电梯',
+      title: '电梯状态',
+      subtitle: '电梯楼层与运行状态',
+      bgColor: AppColors.iconElevator,
+    ),
+    _MenuItemData(
+      label: '故障',
+      title: '故障',
+      subtitle: '查看当前/NS 故障信息',
+      bgColor: AppColors.iconFault,
+    ),
+    _MenuItemData(
+      label: 'IO',
+      title: 'I/O 查看',
+      subtitle: '井道/机房/门信号状态查询',
+      bgColor: AppColors.iconIO,
+    ),
+    _MenuItemData(
+      label: 'HMI',
+      title: 'HMI',
+      subtitle: 'HMI 打开/关闭控制',
+      bgColor: AppColors.iconHMI,
+    ),
+    _MenuItemData(
+      label: '印板',
+      title: '印板验证',
+      subtitle: '印板验证功能',
+      bgColor: AppColors.iconPCB,
+    ),
+    _MenuItemData(
+      label: '参数',
+      title: '参数修改',
+      subtitle: 'NV 参数读取与修改',
+      bgColor: AppColors.iconParam,
+    ),
+    _MenuItemData(
+      label: '程序',
+      title: '程序信息',
+      subtitle: '查看各版本程序信息',
+      bgColor: AppColors.iconProgram,
+    ),
+    _MenuItemData(
+      label: '时钟',
+      title: '系统时钟',
+      subtitle: '电梯时钟读取与设置',
+      bgColor: AppColors.iconClock,
+    ),
+  ];
 
   // ==================== 菜单项列表（动态读取 Theme 颜色） ====================
   List<Widget> _buildMenuItems(BuildContext context) {
     final theme = Theme.of(context);
     final cardColor = theme.cardTheme.color ?? Colors.white;
     final borderColor = theme.dividerColor;
-    final primaryText = theme.textTheme.titleMedium?.color ?? const Color(0xFF1F2937);
-    final secondaryText = theme.textTheme.bodySmall?.color ?? const Color(0xFF6B7280);
+    final primaryText =
+        theme.textTheme.titleMedium?.color ?? const Color(0xFF1F2937);
+    final secondaryText =
+        theme.textTheme.bodySmall?.color ?? const Color(0xFF6B7280);
 
     return _menuItems.map((item) {
       return Padding(
@@ -206,19 +208,12 @@ class ZkcdMenuPage extends StatelessWidget {
                         const SizedBox(height: 3),
                         Text(
                           item.subtitle,
-                          style: TextStyle(
-                            color: secondaryText,
-                            fontSize: 12,
-                          ),
+                          style: TextStyle(color: secondaryText, fontSize: 12),
                         ),
                       ],
                     ),
                   ),
-                  Icon(
-                    Icons.chevron_right,
-                    color: secondaryText,
-                    size: 22,
-                  ),
+                  Icon(Icons.chevron_right, color: secondaryText, size: 22),
                 ],
               ),
             ),
