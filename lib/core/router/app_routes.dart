@@ -2,8 +2,11 @@
 class AppRoutes {
   const AppRoutes._();
 
+  // ZKCD 功能菜单（当前首页）
+  static const zkcdMenu = "/";
+
   // 应用首页路径。
-  static const home = "/";
+  static const home = "/home";
 
   // 手册列表页真实路径。
   static const manuals = "/manuals";

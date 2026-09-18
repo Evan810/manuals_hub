@@ -2,8 +2,9 @@ import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../features/application.dart';
-import '../../features/manuals/pages/manuals_chapter_page.dart';
-import '../../features/manuals/pages/manuals_list_page.dart';
+import '../../features/manuals/views/manuals_chapter_page.dart';
+import '../../features/manuals/views/manuals_list_page.dart';
+import '../../features/zkcd/views/zkcd_menu_page.dart';
 import 'app_routes.dart';
 
 // 这一行必须写，build_runner 会根据它生成 app_router.g.dart。
@@ -15,13 +16,18 @@ part 'app_router.g.dart';
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
   return GoRouter(
-    // 应用启动后默认进入首页。
+    // 应用启动后默认进入应用首页。
     initialLocation: AppRoutes.home,
-    routes: [
-      // / -> 应用首页
+    routes: [     
+      // /home -> 应用首页
       GoRoute(
         path: AppRoutes.home,
         builder: (_, _) => const Application(),
+      ),
+       // / -> ZKCD 功能菜单（复刻截图 UI）
+      GoRoute(
+        path: AppRoutes.zkcdMenu,
+        builder: (_, _) => const ZkcdMenuPage(),
       ),
       // /manuals -> 新闻列表页
       GoRoute(
