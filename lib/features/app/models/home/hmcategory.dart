@@ -28,7 +28,7 @@ class _HmCategoryState extends State<HmCategory> {
             // height: 40,
             alignment: Alignment.center,
             margin: const EdgeInsets.only(right: 10),
-            child: Text("品牌", style: TextStyle(color: Colors.white)),
+            child: Text("品牌$index", style: TextStyle(color: Colors.white)),
           );
         },
       ),

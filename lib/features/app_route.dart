@@ -1,5 +1,5 @@
 export 'application.dart';
-export 'app/views/home/widget.dart';
+export 'app/views/home/home.dart';
 export 'app/views/account/account_page.dart';
 export 'app/views/account/account_info_page.dart';
 export 'app/views/account/account_settings_page.dart';
