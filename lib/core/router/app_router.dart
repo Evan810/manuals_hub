@@ -30,7 +30,9 @@ GoRouter appRouter(Ref ref) {
       // /categoryList -> 分类列表页
       GoRoute(
         path: AppRoutes.categoryList,
-        builder: (_, _) => const CategoryListPage(),
+        builder: (_, state) => CategoryListPage(
+          category: state.extra is String ? state.extra as String : null,
+        ),
       ),
 
       //GoRoute 传递两个参数，使用 `extra` 传对象是处理 ID 和中文 title
@@ -64,7 +66,7 @@ GoRouter appRouter(Ref ref) {
           body: '本应用提供的内容仅用于学习和信息参考。实际操作前请遵守设备制造商的技术规范、安全规程和现场管理要求。因使用本应用内容产生的任何后果，请以经过确认的专业资料和现场判断为准。',
         ),
       ),
-      
+
       GoRoute(
         path: AppRoutes.about,
         builder: (_, _) => const AccountInfoPage(

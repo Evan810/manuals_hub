@@ -4,34 +4,24 @@ import 'package:manuals_hub/core/core.dart';
 import 'package:manuals_hub/core/router/app_routes.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
 import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
+import 'package:manuals_hub/features/manuals/data/manuals_repository.dart';
+import 'package:manuals_hub/features/manuals/models/manual.dart';
 
-class CategoryListPage extends StatelessWidget {
-  const CategoryListPage({super.key});
+class CategoryListPage extends StatefulWidget {
+  const CategoryListPage({super.key, this.category});
+
+  final String? category;
+
+  @override
+  State<CategoryListPage> createState() => _CategoryListPageState();
+}
+
+class _CategoryListPageState extends State<CategoryListPage> {
+  final _repository = const ManualsRepository();
 
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.paddingOf(context).top;
-
-    final manuals = [
-      (
-        id: 'article_001',
-        title: '从这里开始使用手册中心',
-        subtitle: '快速熟悉内容结构，找到解决问题的路径',
-        chapterCount: 6,
-      ),
-      (
-        id: 'article_002',
-        title: '电梯运行状态与故障诊断',
-        subtitle: '查看运行状态，定位常见故障原因',
-        chapterCount: 8,
-      ),
-      (
-        id: 'article_003',
-        title: '参数设置与维护操作',
-        subtitle: '了解参数读取、修改及维护流程',
-        chapterCount: 5,
-      ),
-    ];
 
     return Scaffold(
       body: CustomScrollView(
@@ -40,30 +30,62 @@ class CategoryListPage extends StatelessWidget {
             pinned: true,
             delegate: ManualsHeaderDelegate(
               topPadding: topPadding,
-              title: 'xxx手册目录',
+              title: '${widget.category ?? '全部'}手册目录',
               onBack: () => context.pop(),
             ),
           ),
-          SliverPadding(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-            sliver: SliverList.builder(
-              itemCount: manuals.length,
-              itemBuilder: (context, index) {
-                final chapter = manuals[index];
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 10),
-                  child: _ManualCard(
-                    title: chapter.title,
-                    subtitle: chapter.subtitle,
-                    chapterCount: chapter.chapterCount,
-                    onTap: () => context.push(
-                      AppRoutes.chaptersPath(chapter.id),
-                      extra: ChapterArgs(id: chapter.id, title: chapter.title),
-                    ),
+          FutureBuilder<List<Manual>>(
+            future: widget.category == null
+                ? Future.value(const <Manual>[])
+                : _repository.getManualsByCategory(widget.category!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SliverToBoxAdapter(
+                  child: Center(child: CircularProgressIndicator()),
+                );
+              }
+              if (snapshot.hasError) {
+                return SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(24),
+                    child: Text('手册数据库加载失败：${snapshot.error}'),
                   ),
                 );
-              },
-            ),
+              }
+              final manuals = snapshot.data ?? const <Manual>[];
+              if (manuals.isEmpty) {
+                return const SliverToBoxAdapter(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: Center(child: Text('该分类暂无手册')),
+                  ),
+                );
+              }
+              return SliverPadding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                sliver: SliverList.builder(
+                  itemCount: manuals.length,
+                  itemBuilder: (context, index) {
+                    final manual = manuals[index];
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _ManualCard(
+                        title: manual.title,
+                        subtitle: '手册路径：${manual.path}/${manual.entry}',
+                        chapterCount: manual.chapterCount,
+                        onTap: () => context.push(
+                          AppRoutes.chaptersPath('${manual.id}'),
+                          extra: ChapterArgs(
+                            id: '${manual.id}',
+                            title: manual.title,
+                          ),
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              );
+            },
           ),
         ],
       ),
