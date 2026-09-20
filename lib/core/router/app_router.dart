@@ -27,12 +27,16 @@ GoRouter appRouter(Ref ref) {
         builder: (_, _) => const ZkcdMenuPage(),
       ),
 
-      // /categoryList -> 分类列表页
+      // /categoryList -> 分类下的手册列表页
       GoRoute(
         path: AppRoutes.categoryList,
-        builder: (_, state) => CategoryListPage(
-          category: state.extra is String ? state.extra as String : null,
-        ),
+        builder: (_, state) {
+          final extra = state.extra;
+          return CategoryListPage(
+            categoryId: extra is CategoryListArgs ? extra.categoryId : null,
+            title: extra is CategoryListArgs ? extra.title : null,
+          );
+        },
       ),
 
       //GoRoute 传递两个参数，使用 `extra` 传对象是处理 ID 和中文 title
@@ -46,6 +50,15 @@ GoRouter appRouter(Ref ref) {
           return ChapterPage(
             args: ChapterArgs(id: id, title: title),
           );
+        },
+      ),
+
+      // 章节内容页（章节图片，API 3）
+      GoRoute(
+        path: AppRoutes.chapterDetail,
+        builder: (_, state) {
+          final args = state.extra! as ChapterDetailArgs;
+          return ManualsDetailPage(args: args);
         },
       ),
 

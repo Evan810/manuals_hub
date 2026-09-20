@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
+import 'package:manuals_hub/features/manuals/models/category.dart';
 
 class HmCategory extends StatelessWidget {
   const HmCategory({
     super.key,
     required this.categories,
-    required this.selectedCategory,
+    required this.selectedCategoryId,
     required this.onSelected,
   });
 
-  final Map<String, int> categories;
-  final String? selectedCategory;
-  final ValueChanged<String> onSelected;
+  final List<Category> categories;
+  final int? selectedCategoryId;
+  final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +24,8 @@ class HmCategory extends StatelessWidget {
         scrollDirection: Axis.horizontal,
         itemCount: categories.length,
         itemBuilder: (BuildContext context, int index) {
-          final category = categories.keys.elementAt(index);
-          final selected = category == selectedCategory;
+          final category = categories[index];
+          final selected = category.categoryId == selectedCategoryId;
           return Container(
             decoration: BoxDecoration(
               color: selected
@@ -37,9 +38,9 @@ class HmCategory extends StatelessWidget {
             margin: const EdgeInsets.only(right: 10),
             child: InkWell(
               borderRadius: BorderRadius.circular(20),
-              onTap: () => onSelected(category),
+              onTap: () => onSelected(category.categoryId),
               child: Text(
-                '$category (${categories[category]})',
+                category.category,
                 style: TextStyle(
                   color: selected
                       ? Colors.white

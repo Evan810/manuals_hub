@@ -1,0 +1,7 @@
+.venv
+__pycache__
+*.pyc
+.git
+smoke_result.txt
+.pytest_cache
+Dockerfile

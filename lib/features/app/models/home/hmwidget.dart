@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manuals_hub/core/router/app_routes.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
-import 'package:manuals_hub/features/manuals/data/manuals_repository.dart';
+import 'package:manuals_hub/features/manuals/data/manuals_providers.dart';
 import 'package:manuals_hub/features/manuals/models/manual.dart';
 
-class HmWidget extends StatelessWidget {
-  const HmWidget({super.key, required this.category});
+/// 首页手册列表：按选中的 categoryId 加载该分类下的手册。
+class HmWidget extends ConsumerWidget {
+  const HmWidget({super.key, required this.categoryId});
 
-  final String? category;
+  final int? categoryId;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final cardColor = theme.cardTheme.color ?? theme.colorScheme.surface;
     final borderColor = theme.dividerColor;
@@ -20,12 +22,12 @@ class HmWidget extends StatelessWidget {
     final secondaryText =
         theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurfaceVariant;
 
-    if (category == null) {
+    if (categoryId == null) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
 
     return FutureBuilder<List<Manual>>(
-      future: const ManualsRepository().getManualsByCategory(category!),
+      future: ref.read(manualsRepositoryProvider).getManuals(categoryId!),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SliverToBoxAdapter(
@@ -39,12 +41,14 @@ class HmWidget extends StatelessWidget {
         }
         if (snapshot.hasError) {
           return SliverToBoxAdapter(
-            child: _Message(text: '手册数据库加载失败：${snapshot.error}'),
+            child: _Message(text: '手册加载失败：${snapshot.error}'),
           );
         }
         final manuals = snapshot.data ?? const <Manual>[];
         if (manuals.isEmpty) {
-          return const SliverToBoxAdapter(child: _Message(text: '该分类暂无手册'));
+          return const SliverToBoxAdapter(
+            child: _Message(text: '该分类暂无手册'),
+          );
         }
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -58,8 +62,13 @@ class HmWidget extends StatelessWidget {
                   color: Colors.transparent,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
-                    onTap: () =>
-                        context.push(AppRoutes.categoryList, extra: category),
+                    onTap: () => context.push(
+                      AppRoutes.chaptersPath('${manual.id}'),
+                      extra: ChapterArgs(
+                        id: '${manual.id}',
+                        title: manual.title,
+                      ),
+                    ),
                     child: Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 14,
@@ -88,7 +97,7 @@ class HmWidget extends StatelessWidget {
                                 ),
                                 const SizedBox(height: 3),
                                 Text(
-                                  '手册入口：${manual.entry}',
+                                  '${manual.chapterCount} 个章节',
                                   style: TextStyle(
                                     color: secondaryText,
                                     fontSize: 12,
@@ -119,19 +128,36 @@ class HmWidget extends StatelessWidget {
     return Container(
       width: 44,
       height: 44,
+      clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: AppColors.primaryBlue,
         borderRadius: BorderRadius.circular(10),
       ),
       alignment: Alignment.center,
-      child: Text(
-        manual.category,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      // 优先使用本地打包图标；无本地图标时回退为分类名文字
+      child: manual.localIconPath != null
+          ? Image.asset(
+              manual.localIconPath!,
+              width: 44,
+              height: 44,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => Text(
+                manual.category,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            )
+          : Text(
+              manual.category,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
     );
   }
 }

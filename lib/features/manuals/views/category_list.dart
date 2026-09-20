@@ -1,24 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manuals_hub/core/core.dart';
 import 'package:manuals_hub/core/router/app_routes.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
-import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
-import 'package:manuals_hub/features/manuals/data/manuals_repository.dart';
+import 'package:manuals_hub/features/manuals/data/manuals_providers.dart';
 import 'package:manuals_hub/features/manuals/models/manual.dart';
+import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
 
-class CategoryListPage extends StatefulWidget {
-  const CategoryListPage({super.key, this.category});
+/// 分类下的手册列表页：按 categoryId 拉取手册。
+class CategoryListPage extends ConsumerStatefulWidget {
+  const CategoryListPage({super.key, this.categoryId, this.title});
 
-  final String? category;
+  final int? categoryId;
+  final String? title;
 
   @override
-  State<CategoryListPage> createState() => _CategoryListPageState();
+  ConsumerState<CategoryListPage> createState() => _CategoryListPageState();
 }
 
-class _CategoryListPageState extends State<CategoryListPage> {
-  final _repository = const ManualsRepository();
-
+class _CategoryListPageState extends ConsumerState<CategoryListPage> {
   @override
   Widget build(BuildContext context) {
     final topPadding = MediaQuery.paddingOf(context).top;
@@ -30,14 +31,16 @@ class _CategoryListPageState extends State<CategoryListPage> {
             pinned: true,
             delegate: ManualsHeaderDelegate(
               topPadding: topPadding,
-              title: '${widget.category ?? '全部'}手册目录',
+              title: '${widget.title ?? '全部'}手册目录',
               onBack: () => context.pop(),
             ),
           ),
           FutureBuilder<List<Manual>>(
-            future: widget.category == null
+            future: widget.categoryId == null
                 ? Future.value(const <Manual>[])
-                : _repository.getManualsByCategory(widget.category!),
+                : ref.read(manualsRepositoryProvider).getManuals(
+                      widget.categoryId!,
+                    ),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const SliverToBoxAdapter(
@@ -48,7 +51,7 @@ class _CategoryListPageState extends State<CategoryListPage> {
                 return SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.all(24),
-                    child: Text('手册数据库加载失败：${snapshot.error}'),
+                    child: Text('手册加载失败：${snapshot.error}'),
                   ),
                 );
               }
@@ -71,8 +74,10 @@ class _CategoryListPageState extends State<CategoryListPage> {
                       padding: const EdgeInsets.only(bottom: 10),
                       child: _ManualCard(
                         title: manual.title,
-                        subtitle: '手册路径：${manual.path}/${manual.entry}',
+                        subtitle: manual.entryUrl ?? '',
                         chapterCount: manual.chapterCount,
+                        iconPath: manual.localIconPath,
+                        category: manual.category,
                         onTap: () => context.push(
                           AppRoutes.chaptersPath('${manual.id}'),
                           extra: ChapterArgs(
@@ -98,12 +103,16 @@ class _ManualCard extends StatelessWidget {
     required this.title,
     required this.subtitle,
     required this.chapterCount,
+    required this.iconPath,
+    required this.category,
     required this.onTap,
   });
 
   final String title;
   final String subtitle;
   final int chapterCount;
+  final String? iconPath;
+  final String category;
   final VoidCallback onTap;
 
   @override
@@ -128,11 +137,35 @@ class _ManualCard extends StatelessWidget {
               Container(
                 width: 44,
                 height: 44,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   color: AppColors.primaryBlue,
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Icon(Icons.menu_book_rounded, color: Colors.white),
+                alignment: Alignment.center,
+                child: iconPath != null
+                    ? Image.asset(
+                        iconPath!,
+                        width: 44,
+                        height: 44,
+                        fit: BoxFit.cover,
+                        errorBuilder: (_, _, _) => Text(
+                          category,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      )
+                    : Text(
+                        category,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -147,11 +180,6 @@ class _ManualCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      subtitle,
-                      style: TextStyle(fontSize: 12, color: secondaryText),
-                    ),
-                    const SizedBox(height: 6),
                     Text(
                       '$chapterCount 个章节',
                       style: TextStyle(fontSize: 12, color: secondaryText),
