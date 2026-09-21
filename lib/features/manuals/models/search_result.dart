@@ -72,8 +72,7 @@ class SearchResult {
   final List<ChapterSearchResult> chapters;
 
   /// 是否三类结果全部为空。
-  bool get isEmpty =>
-      brands.isEmpty && manuals.isEmpty && chapters.isEmpty;
+  bool get isEmpty => brands.isEmpty && manuals.isEmpty && chapters.isEmpty;
 
   factory SearchResult.fromJson(Map<String, Object?> json) {
     return SearchResult(

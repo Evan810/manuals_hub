@@ -16,40 +16,71 @@ class HmCategory extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cardColor = theme.cardTheme.color ?? theme.colorScheme.surface;
     return Container(
       width: double.infinity,
       height: 40,
+      decoration: BoxDecoration(color: cardColor),
       padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 2),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: categories.length,
-        itemBuilder: (BuildContext context, int index) {
-          final category = categories[index];
-          final selected = category.categoryId == selectedCategoryId;
-          return Container(
-            decoration: BoxDecoration(
-              color: selected
-                  ? AppColors.primaryBlue
-                  : Theme.of(context).colorScheme.surfaceContainerHighest,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            alignment: Alignment.center,
-            margin: const EdgeInsets.only(right: 10),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () => onSelected(category.categoryId),
-              child: Text(
-                category.category,
-                style: TextStyle(
-                  color: selected
-                      ? Colors.white
-                      : Theme.of(context).colorScheme.onSurfaceVariant,
+      // 4 个分类在导航栏内动态平分宽度，不再横向滚动。
+      child: Row(
+        children: [
+          for (final category in categories)
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 10),
+                child: _CategoryChip(
+                  label: category.category,
+                  selected: category.categoryId == selectedCategoryId,
+                  onTap: () => onSelected(category.categoryId),
                 ),
               ),
             ),
-          );
-        },
+        ],
+      ),
+    );
+  }
+}
+
+class _CategoryChip extends StatelessWidget {
+  const _CategoryChip({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: selected
+          ? AppColors.primaryBlue
+          : Theme.of(context).colorScheme.surfaceContainerHighest,
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: onTap,
+        child: Container(
+          height: 28,
+          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 6),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: selected
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
+        ),
       ),
     );
   }

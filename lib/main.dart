@@ -5,12 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_mode_provider.dart';
+import 'features/manuals/data/local_manual_repository.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // 预先加载 SharedPreferences，避免 Provider 内部异步读取时的启动闪烁。
   final prefs = await SharedPreferences.getInstance();
+  await LocalManualRepository.instance.initialize();
 
   runApp(
     ProviderScope(

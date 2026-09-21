@@ -40,6 +40,13 @@ class AccountSettingsPage extends ConsumerWidget {
                 value: account.voiceEnabled,
                 onChanged: ref.read(accountProvider.notifier).toggleVoice,
               ),
+              ListTile(
+                leading: const Icon(Icons.download_for_offline_outlined),
+                title: const Text('已下载手册'),
+                subtitle: const Text('管理按需下载的资源包与存储空间'),
+                trailing: const Icon(Icons.chevron_right_rounded),
+                onTap: () => context.push(AppRoutes.packStorage),
+              ),
             ],
           ),
           const SizedBox(height: 12),

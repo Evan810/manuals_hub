@@ -22,6 +22,8 @@ class ManualListItemOut(BaseModel):
     entry_url: str
     chapter_count: int
     size: int
+    # true=随安装包内置；false=按需下载资源包
+    bundled: bool = False
 
 
 # ---------- API 2：章节列表 ----------
@@ -66,6 +68,7 @@ class ManualResult(BaseModel):
     category_id: int
     icon: str
     entry_url: str
+    bundled: bool = False
 
 
 class ChapterSearchResult(BaseModel):
@@ -82,3 +85,5 @@ class SearchOut(BaseModel):
     brands: list[BrandResult]
     manuals: list[ManualResult]
     chapters: list[ChapterSearchResult]
+    # 每个分组是否因达到上限而被截断（前端可提示“结果过多请细化关键字”）
+    truncated: dict[str, bool] = {}

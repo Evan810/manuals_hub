@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:manuals_hub/core/router/app_routes.dart';
-import 'package:manuals_hub/core/theme/app_colors.dart';
-import 'package:manuals_hub/features/manuals/data/manuals_providers.dart';
+import 'package:manuals_hub/core/core.dart';
+import 'package:manuals_hub/features/manuals/data/manual_providers.dart';
 import 'package:manuals_hub/features/manuals/models/manual.dart';
 
-/// 首页手册列表：按选中的 categoryId 加载该分类下的手册。
+/// 首页手册列表：按选中的 categoryId 加载该分类下的手册（Provider 缓存）。
 class HmWidget extends ConsumerWidget {
   const HmWidget({super.key, required this.categoryId});
 
@@ -22,33 +21,31 @@ class HmWidget extends ConsumerWidget {
     final secondaryText =
         theme.textTheme.bodySmall?.color ?? theme.colorScheme.onSurfaceVariant;
 
-    if (categoryId == null) {
+    final id = categoryId;
+    if (id == null) {
       return const SliverToBoxAdapter(child: SizedBox.shrink());
     }
 
-    return FutureBuilder<List<Manual>>(
-      future: ref.read(manualsRepositoryProvider).getManuals(categoryId!),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SliverToBoxAdapter(
-            child: Center(
-              child: Padding(
-                padding: EdgeInsets.all(32),
-                child: CircularProgressIndicator(),
-              ),
-            ),
-          );
-        }
-        if (snapshot.hasError) {
-          return SliverToBoxAdapter(
-            child: _Message(text: '手册加载失败：${snapshot.error}'),
-          );
-        }
-        final manuals = snapshot.data ?? const <Manual>[];
+    final manualsAsync = ref.watch(manualsByCategoryProvider(id));
+    return manualsAsync.when(
+      loading: () => const SliverToBoxAdapter(
+        child: Center(
+          child: Padding(
+            padding: EdgeInsets.all(32),
+            child: CircularProgressIndicator(),
+          ),
+        ),
+      ),
+      error: (error, _) => SliverToBoxAdapter(
+        child: _Message(
+          text: '手册加载失败：$error',
+          actionLabel: '重试',
+          onAction: () => ref.invalidate(manualsByCategoryProvider(id)),
+        ),
+      ),
+      data: (manuals) {
         if (manuals.isEmpty) {
-          return const SliverToBoxAdapter(
-            child: _Message(text: '该分类暂无手册'),
-          );
+          return const SliverToBoxAdapter(child: _Message(text: '该分类暂无手册'));
         }
         return SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
@@ -57,15 +54,14 @@ class HmWidget extends ConsumerWidget {
             itemBuilder: (context, index) {
               final manual = manuals[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 10),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Material(
                   color: Colors.transparent,
                   child: InkWell(
                     borderRadius: BorderRadius.circular(12),
                     onTap: () => context.push(
-                      AppRoutes.chaptersPath('${manual.id}'),
-                      extra: ChapterArgs(
-                        id: '${manual.id}',
+                      AppRoutes.chaptersPath(
+                        '${manual.id}',
                         title: manual.title,
                       ),
                     ),
@@ -163,15 +159,28 @@ class HmWidget extends ConsumerWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message({required this.text});
+  const _Message({required this.text, this.actionLabel, this.onAction});
 
   final String text;
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(24),
-      child: Center(child: Text(text)),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(text, textAlign: TextAlign.center),
+            if (actionLabel != null && onAction != null) ...[
+              const SizedBox(height: 10),
+              OutlinedButton(onPressed: onAction, child: Text(actionLabel!)),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

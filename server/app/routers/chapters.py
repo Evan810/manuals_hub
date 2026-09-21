@@ -27,7 +27,8 @@ def chapter_images(
     # 双重校验：chapter_id 必须确实属于该 manual_id
     chapter = conn.execute(
         """
-        SELECT c.id, c.manual_id, m.path AS manual_path
+        SELECT c.id, c.manual_id, m.path AS manual_path,
+               m.category_id AS manual_category_id
         FROM chapters c
         JOIN manuals m ON m.id = c.manual_id
         WHERE c.id = ?
@@ -56,5 +57,10 @@ def chapter_images(
     return {
         "manual_id": manual_id,
         "chapter_id": chapter_id,
-        "images": [serialize_image(row, chapter["manual_path"]) for row in rows],
+        "images": [
+            serialize_image(
+                row, chapter["manual_path"], chapter["manual_category_id"]
+            )
+            for row in rows
+        ],
     }

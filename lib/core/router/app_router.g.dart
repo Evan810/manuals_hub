@@ -9,21 +9,18 @@ part of 'app_router.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// 应用级路由 Provider。
-///
 /// keepAlive 表示这个路由对象在应用运行期间保持稳定。
 
 @ProviderFor(appRouter)
 final appRouterProvider = AppRouterProvider._();
 
 /// 应用级路由 Provider。
-///
 /// keepAlive 表示这个路由对象在应用运行期间保持稳定。
 
 final class AppRouterProvider
     extends $FunctionalProvider<GoRouter, GoRouter, GoRouter>
     with $Provider<GoRouter> {
   /// 应用级路由 Provider。
-  ///
   /// keepAlive 表示这个路由对象在应用运行期间保持稳定。
   AppRouterProvider._()
     : super(
@@ -58,4 +55,4 @@ final class AppRouterProvider
   }
 }
 
-String _$appRouterHash() => r'ee9c642ca2dc3e1b2d57d647a04b6a3ecb0d5f54';
+String _$appRouterHash() => r'c6d9f2f95c98739924a9b965994c51225af217c0';

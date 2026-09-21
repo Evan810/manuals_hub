@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:manuals_hub/core/theme/app_colors.dart';
+import 'package:manuals_hub/features/manuals/views/category_list.dart';
 
 import 'app/app.dart';
 
@@ -20,7 +21,7 @@ class _ApplicationState extends State<Application> {
         index: _selectedIndex,
         children: [
           HomePage(onAccountTap: () => setState(() => _selectedIndex = 3)),
-          PackagesPage(),
+          const CategoryListPage(categoryId: 4, title: '锦囊妙计'),
           ToolsPage(),
           const AccountPage(),
         ],

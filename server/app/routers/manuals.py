@@ -53,9 +53,9 @@ def list_chapters(
     manual_id: int,
     conn: sqlite3.Connection = Depends(get_db),
 ) -> list[dict]:
-    # 确认手册存在，并拿到 path 用于拼 entry_url
+    # 确认手册存在，并拿到 path / category_id 用于拼 entry_url
     manual = conn.execute(
-        "SELECT path FROM manuals WHERE id = ?",
+        "SELECT path, category_id FROM manuals WHERE id = ?",
         [manual_id],
     ).fetchone()
     if manual is None:
@@ -71,4 +71,7 @@ def list_chapters(
         """,
         [manual_id],
     ).fetchall()
-    return [serialize_chapter(row, manual["path"]) for row in rows]
+    return [
+        serialize_chapter(row, manual["path"], manual["category_id"])
+        for row in rows
+    ]

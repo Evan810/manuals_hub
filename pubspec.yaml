@@ -7,14 +7,23 @@ environment:
   sdk: ^3.13.2
 
 dependencies:
+  archive: ^3.6.1
   cached_network_image: ^3.4.1
+  convert: ^3.1.2
+  crypto: ^3.0.5
   dio: ^5.11.1
   flutter:
     sdk: flutter
   flutter_riverpod: ^3.4.3
   go_router: ^18.0.1
+  mime: ^2.0.0
+  path: ^1.9.1
+  path_provider: ^2.1.4
   riverpod_annotation: ^4.0.7
   shared_preferences: ^2.5.2
+  shelf: ^1.4.1
+  sqflite: ^2.4.4
+  webview_flutter: ^4.13.1
 
 dev_dependencies:
   flutter_test:
@@ -27,4 +36,78 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
+    - assets/catalog.json
+    - assets/Manuals.db
     - assets/icons/
+    - assets/0/hge/
+    - assets/0/hge/html/
+    - assets/0/hge/html/001/
+    - assets/0/hge/html/css/
+    - assets/0/hge/html/css/images/
+    - assets/0/hge/html/img/
+    - assets/0/hge/html/js/
+    - assets/0/mitsubishi_2.0/
+    - assets/0/mitsubishi_2.0/html/
+    - assets/0/mitsubishi_2.0/html/001/
+    - assets/0/mitsubishi_2.0/html/css/
+    - assets/0/mitsubishi_2.0/html/css/images/
+    - assets/0/mitsubishi_2.0/html/img/
+    - assets/0/mitsubishi_2.0/html/js/
+    - assets/0/mitsubishi_classic/
+    - assets/0/mitsubishi_classic/html/
+    - assets/0/mitsubishi_classic/html/001/
+    - assets/0/mitsubishi_classic/html/css/
+    - assets/0/mitsubishi_classic/html/css/images/
+    - assets/0/mitsubishi_classic/html/img/
+    - assets/0/mitsubishi_classic/html/js/
+    - assets/0/y15/
+    - assets/0/y15/html/
+    - assets/0/y15/html/001/
+    - assets/0/y15/html/css/
+    - assets/0/y15/html/css/images/
+    - assets/0/y15/html/img/
+    - assets/0/y15/html/js/
+    - assets/1/acd5/
+    - assets/1/acd5/html/
+    - assets/1/acd5/html/001/
+    - assets/1/acd5/html/css/
+    - assets/1/acd5/html/css/images/
+    - assets/1/acd5/html/img/
+    - assets/1/acd5/html/js/
+    - assets/1/kone_kce/
+    - assets/1/kone_kce/html/
+    - assets/1/kone_kce/html/001/
+    - assets/1/kone_kce/html/css/
+    - assets/1/kone_kce/html/css/images/
+    - assets/1/kone_kce/html/img/
+    - assets/1/kone_kce/html/js/
+    - assets/2/xj_1.0/
+    - assets/2/xj_1.0/html/
+    - assets/2/xj_1.0/html/001/
+    - assets/2/xj_1.0/html/css/
+    - assets/2/xj_1.0/html/css/images/
+    - assets/2/xj_1.0/html/img/
+    - assets/2/xj_1.0/html/js/
+    - assets/3/fujitec_1.10/
+    - assets/3/fujitec_1.10/html/
+    - assets/3/fujitec_1.10/html/001/
+    - assets/3/fujitec_1.10/html/css/
+    - assets/3/fujitec_1.10/html/css/images/
+    - assets/3/fujitec_1.10/html/img/
+    - assets/3/fujitec_1.10/html/js/
+    - assets/3/tcm_b/
+    - assets/3/tcm_b/html/
+    - assets/3/tcm_b/html/001/
+    - assets/3/tcm_b/html/css/
+    - assets/3/tcm_b/html/css/images/
+    - assets/3/tcm_b/html/img/
+    - assets/3/tcm_b/html/js/
+    - assets/4/elevator_toolbox/
+    - assets/4/elevator_toolbox/html/
+    - assets/4/elevator_toolbox/html/001/
+    - assets/4/elevator_toolbox/html/002/
+    - assets/4/elevator_toolbox/html/002/pages/
+    - assets/4/elevator_toolbox/html/css/
+    - assets/4/elevator_toolbox/html/css/images/
+    - assets/4/elevator_toolbox/html/img/
+    - assets/4/elevator_toolbox/html/js/

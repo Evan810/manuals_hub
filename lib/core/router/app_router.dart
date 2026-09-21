@@ -1,16 +1,16 @@
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manuals_hub/core/router/app_routes.dart';
+import 'package:manuals_hub/features/app/app.dart';
+import 'package:manuals_hub/features/application.dart';
+import 'package:manuals_hub/features/manuals/manuals.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-
-import '/features/app_route.dart';
-
-import '../../features/zkcd/views/zkcd_menu_page.dart';
 
 // 这一行必须写，build_runner 会根据它生成 app_router.g.dart。
 part 'app_router.g.dart';
 
 /// 应用级路由 Provider。
-///
+
 /// keepAlive 表示这个路由对象在应用运行期间保持稳定。
 @Riverpod(keepAlive: true)
 GoRouter appRouter(Ref ref) {
@@ -21,44 +21,75 @@ GoRouter appRouter(Ref ref) {
       // /home -> 应用首页
       GoRoute(path: AppRoutes.home, builder: (_, _) => const Application()),
 
-      // / -> ZKCD 功能菜单（复刻截图 UI）
-      GoRoute(
-        path: AppRoutes.zkcdMenu,
-        builder: (_, _) => const ZkcdMenuPage(),
-      ),
-
-      // /categoryList -> 分类下的手册列表页
+      // /CategoryList?id=&title= -> 分类下的手册列表页
       GoRoute(
         path: AppRoutes.categoryList,
         builder: (_, state) {
+          // 必要 id 优先取 URL query；extra 仅作兼容兜底。
           final extra = state.extra;
-          return CategoryListPage(
-            categoryId: extra is CategoryListArgs ? extra.categoryId : null,
-            title: extra is CategoryListArgs ? extra.title : null,
-          );
+          final categoryId =
+              int.tryParse(state.uri.queryParameters['id'] ?? '') ??
+              (extra is CategoryListArgs ? extra.categoryId : null);
+          final title =
+              state.uri.queryParameters['title'] ??
+              (extra is CategoryListArgs ? extra.title : null);
+          return CategoryListPage(categoryId: categoryId, title: title);
         },
       ),
 
-      //GoRoute 传递两个参数，使用 `extra` 传对象是处理 ID 和中文 title
+      // /CategoryList/:id?title= -> 某手册的章节目录
       GoRoute(
         path: AppRoutes.chaptersList,
         builder: (_, state) {
           final id = state.pathParameters['id']!;
           final extra = state.extra;
-          final title = extra is ChapterArgs ? extra.title : '手册章节目录';
-
+          final title =
+              state.uri.queryParameters['title'] ??
+              (extra is ChapterArgs ? extra.title : '手册章节目录');
           return ChapterPage(
             args: ChapterArgs(id: id, title: title),
           );
         },
       ),
 
-      // 章节内容页（章节图片，API 3）
+      // /chapter-detail/:manualId/:chapterId?title=
+      // 当前无页面跳转入口，仅保证深链非法参数时不崩溃。
       GoRoute(
         path: AppRoutes.chapterDetail,
         builder: (_, state) {
-          final args = state.extra! as ChapterDetailArgs;
-          return ManualsDetailPage(args: args);
+          final manualId = int.tryParse(state.pathParameters['manualId'] ?? '');
+          final chapterId = int.tryParse(
+            state.pathParameters['chapterId'] ?? '',
+          );
+          final title = state.uri.queryParameters['title'] ?? '章节详情';
+          if (manualId == null || chapterId == null) {
+            return const _RouteErrorPage(message: '章节链接缺少必要参数');
+          }
+          return ManualsDetailPage(
+            args: ChapterDetailArgs(
+              manualId: manualId,
+              chapterId: chapterId,
+              title: title,
+            ),
+          );
+        },
+      ),
+
+      // /manual/:id?entry=&anchor=&title= -> 本地 HTML 手册阅读页
+      GoRoute(
+        path: AppRoutes.localManual,
+        builder: (_, state) {
+          final manualId = int.tryParse(state.pathParameters['id'] ?? '');
+          if (manualId == null) {
+            return const _RouteErrorPage(message: '手册链接缺少必要参数');
+          }
+          final query = state.uri.queryParameters;
+          return LocalManualPage(
+            manualId: manualId,
+            title: query['title'] ?? '手册',
+            entryRelative: query['entry'],
+            anchor: query['anchor'],
+          );
         },
       ),
 
@@ -70,6 +101,11 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: AppRoutes.accountSettings,
         builder: (_, _) => const AccountSettingsPage(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.packStorage,
+        builder: (_, _) => const PackStoragePage(),
       ),
 
       GoRoute(
@@ -89,4 +125,24 @@ GoRouter appRouter(Ref ref) {
       ),
     ],
   );
+}
+
+/// 深链/恢复页面参数非法时的安全兜底页。
+class _RouteErrorPage extends StatelessWidget {
+  const _RouteErrorPage({required this.message});
+
+  final String message;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('无法打开页面')),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(24),
+          child: Text(message, textAlign: TextAlign.center),
+        ),
+      ),
+    );
+  }
 }

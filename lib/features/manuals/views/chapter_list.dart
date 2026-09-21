@@ -2,21 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manuals_hub/core/core.dart';
-import 'package:manuals_hub/features/manuals/data/manuals_providers.dart';
-import 'package:manuals_hub/features/manuals/models/chapter.dart';
+import 'package:manuals_hub/features/manuals/data/manual_providers.dart';
 import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
 
-/// 手册章节列表页：通过 manual_id 拉取章节（API 2）。
+/// 手册章节列表页：通过 manual_id 读取本地章节（一次查询，结果由 Provider 缓存）。
 class ChapterPage extends ConsumerWidget {
   const ChapterPage({super.key, required this.args});
 
-  // id 是 manual_id（来自 URL），title 来自 go_router 的 extra。
+  // id 是 manual_id（来自 URL），title 来自 query/extra。
   final ChapterArgs args;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final topPadding = MediaQuery.paddingOf(context).top;
     final manualId = int.tryParse(args.id) ?? 0;
+    final chaptersAsync = ref.watch(chaptersByManualProvider(manualId));
 
     return Scaffold(
       body: CustomScrollView(
@@ -29,28 +29,30 @@ class ChapterPage extends ConsumerWidget {
               onBack: () => context.pop(),
             ),
           ),
-          FutureBuilder<List<Chapter>>(
-            future:
-                ref.read(manualsRepositoryProvider).getChapters(manualId),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(32),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                );
-              }
-              if (snapshot.hasError) {
-                return SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text('章节加载失败：${snapshot.error}'),
-                  ),
-                );
-              }
-
-              final chapters = snapshot.data ?? const <Chapter>[];
+          chaptersAsync.when(
+            loading: () => const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            error: (error, _) => SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Text('章节加载失败：$error', textAlign: TextAlign.center),
+                    const SizedBox(height: 12),
+                    OutlinedButton(
+                      onPressed: () =>
+                          ref.invalidate(chaptersByManualProvider(manualId)),
+                      child: const Text('重试'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            data: (chapters) {
               if (chapters.isEmpty) {
                 return const SliverToBoxAdapter(
                   child: Padding(
@@ -59,7 +61,6 @@ class ChapterPage extends ConsumerWidget {
                   ),
                 );
               }
-
               return SliverPadding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
                 sliver: SliverList.builder(
@@ -67,15 +68,17 @@ class ChapterPage extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final chapter = chapters[index];
                     return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
+                      padding: const EdgeInsets.only(bottom: 2),
                       child: _ChapterCard(
-                        title:
-                            '第${chapter.chapterNo}章：${chapter.title}',
+                        title: chapter.title,
                         onTap: () => context.push(
-                          AppRoutes.chapterDetail,
-                          extra: ChapterDetailArgs(
-                            manualId: manualId,
-                            chapterId: chapter.id,
+                          AppRoutes.localManualPath(
+                            manualId,
+                            // html_path 缺省时阅读页会用手册默认入口兜底。
+                            entryRelative: chapter.htmlPath,
+                            anchor: chapter.isReader
+                                ? 'p${chapter.pageStart}'
+                                : null,
                             title: chapter.title,
                           ),
                         ),
@@ -117,7 +120,7 @@ class _ChapterCard extends StatelessWidget {
           ),
           child: Row(
             children: [
-              const Icon(Icons.menu_book_rounded, color: Colors.blue),
+              // const Icon(Icons.menu_book_rounded, color: AppColors.primaryBlue),
               const SizedBox(width: 14),
               Expanded(
                 child: Text(

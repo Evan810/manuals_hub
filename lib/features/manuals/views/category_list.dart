@@ -2,27 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:manuals_hub/core/core.dart';
-import 'package:manuals_hub/core/router/app_routes.dart';
-import 'package:manuals_hub/core/theme/app_colors.dart';
-import 'package:manuals_hub/features/manuals/data/manuals_providers.dart';
-import 'package:manuals_hub/features/manuals/models/manual.dart';
+import 'package:manuals_hub/features/manuals/data/manual_providers.dart';
 import 'package:manuals_hub/features/manuals/models/manuals_header.dart';
 
-/// 分类下的手册列表页：按 categoryId 拉取手册。
-class CategoryListPage extends ConsumerStatefulWidget {
+/// 分类下的手册列表页：按 categoryId 读取本地手册（Provider 缓存）。
+class CategoryListPage extends ConsumerWidget {
   const CategoryListPage({super.key, this.categoryId, this.title});
 
   final int? categoryId;
   final String? title;
 
   @override
-  ConsumerState<CategoryListPage> createState() => _CategoryListPageState();
-}
-
-class _CategoryListPageState extends ConsumerState<CategoryListPage> {
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final topPadding = MediaQuery.paddingOf(context).top;
+    final id = categoryId;
+    final manualsAsync = id == null
+        ? null
+        : ref.watch(manualsByCategoryProvider(id));
 
     return Scaffold(
       body: CustomScrollView(
@@ -31,67 +27,77 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
             pinned: true,
             delegate: ManualsHeaderDelegate(
               topPadding: topPadding,
-              title: '${widget.title ?? '全部'}手册目录',
+              title: '${title ?? '全部'}手册目录',
               onBack: () => context.pop(),
             ),
           ),
-          FutureBuilder<List<Manual>>(
-            future: widget.categoryId == null
-                ? Future.value(const <Manual>[])
-                : ref.read(manualsRepositoryProvider).getManuals(
-                      widget.categoryId!,
-                    ),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SliverToBoxAdapter(
+          if (id == null)
+            const SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.all(24),
+                child: Center(child: Text('缺少分类参数，无法展示手册列表')),
+              ),
+            )
+          else
+            manualsAsync!.when(
+              loading: () => const SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.all(32),
                   child: Center(child: CircularProgressIndicator()),
-                );
-              }
-              if (snapshot.hasError) {
-                return SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24),
-                    child: Text('手册加载失败：${snapshot.error}'),
+                ),
+              ),
+              error: (error, _) => SliverToBoxAdapter(
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    children: [
+                      Text('手册加载失败：$error', textAlign: TextAlign.center),
+                      const SizedBox(height: 12),
+                      OutlinedButton(
+                        onPressed: () =>
+                            ref.invalidate(manualsByCategoryProvider(id)),
+                        child: const Text('重试'),
+                      ),
+                    ],
                   ),
-                );
-              }
-              final manuals = snapshot.data ?? const <Manual>[];
-              if (manuals.isEmpty) {
-                return const SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.all(24),
-                    child: Center(child: Text('该分类暂无手册')),
-                  ),
-                );
-              }
-              return SliverPadding(
-                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-                sliver: SliverList.builder(
-                  itemCount: manuals.length,
-                  itemBuilder: (context, index) {
-                    final manual = manuals[index];
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 10),
-                      child: _ManualCard(
-                        title: manual.title,
-                        subtitle: manual.entryUrl ?? '',
-                        chapterCount: manual.chapterCount,
-                        iconPath: manual.localIconPath,
-                        category: manual.category,
-                        onTap: () => context.push(
-                          AppRoutes.chaptersPath('${manual.id}'),
-                          extra: ChapterArgs(
-                            id: '${manual.id}',
-                            title: manual.title,
+                ),
+              ),
+              data: (manuals) {
+                if (manuals.isEmpty) {
+                  return const SliverToBoxAdapter(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Center(child: Text('该分类暂无手册')),
+                    ),
+                  );
+                }
+                return SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                  sliver: SliverList.builder(
+                    itemCount: manuals.length,
+                    itemBuilder: (context, index) {
+                      final manual = manuals[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 10),
+                        child: _ManualCard(
+                          title: manual.title,
+                          chapterCount: manual.chapterCount,
+                          iconPath: manual.localIconPath,
+                          category: manual.category,
+                          bundled: manual.bundled,
+                          onTap: () => context.push(
+                            AppRoutes.localManualPath(
+                              manual.id,
+                              title: manual.title,
+                            ),
                           ),
                         ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                      );
+                    },
+                  ),
+                );
+              },
+            ),
         ],
       ),
     );
@@ -101,18 +107,18 @@ class _CategoryListPageState extends ConsumerState<CategoryListPage> {
 class _ManualCard extends StatelessWidget {
   const _ManualCard({
     required this.title,
-    required this.subtitle,
     required this.chapterCount,
     required this.iconPath,
     required this.category,
+    required this.bundled,
     required this.onTap,
   });
 
   final String title;
-  final String subtitle;
   final int chapterCount;
   final String? iconPath;
   final String category;
+  final bool bundled;
   final VoidCallback onTap;
 
   @override
@@ -180,9 +186,26 @@ class _ManualCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '$chapterCount 个章节',
-                      style: TextStyle(fontSize: 12, color: secondaryText),
+                    Row(
+                      children: [
+                        Text(
+                          '$chapterCount 个章节',
+                          style: TextStyle(fontSize: 12, color: secondaryText),
+                        ),
+                        const SizedBox(width: 8),
+                        Icon(
+                          bundled
+                              ? Icons.download_done_rounded
+                              : Icons.cloud_outlined,
+                          size: 13,
+                          color: secondaryText,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          bundled ? '已内置' : '按需下载',
+                          style: TextStyle(fontSize: 11, color: secondaryText),
+                        ),
+                      ],
                     ),
                   ],
                 ),

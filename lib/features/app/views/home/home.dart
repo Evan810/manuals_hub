@@ -3,8 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:manuals_hub/features/app/models/home/hmcategory.dart';
 import 'package:manuals_hub/features/app/models/home/until_appbar.dart';
 import 'package:manuals_hub/features/app/models/home/hmwidget.dart';
-import 'package:manuals_hub/features/manuals/data/manuals_providers.dart';
+import 'package:manuals_hub/features/manuals/data/manual_providers.dart';
 import 'package:manuals_hub/features/manuals/models/category.dart';
+
+/// 锦囊妙计分类 id：该分类从首页分类栏移除，统一放到底部导航“锦囊妙计”。
+const int _tipsCategoryId = 4;
 
 class HomePage extends ConsumerStatefulWidget {
   const HomePage({super.key, required this.onAccountTap});
@@ -16,69 +19,60 @@ class HomePage extends ConsumerStatefulWidget {
 }
 
 class _HomePageState extends ConsumerState<HomePage> {
-  List<Category> _categories = const [];
   int? _selectedCategoryId;
-  Object? _error;
 
-  @override
-  void initState() {
-    super.initState();
-    _loadCategories();
-  }
-
-  Future<void> _loadCategories() async {
-    try {
-      final categories =
-          await ref.read(manualsRepositoryProvider).getCategories();
-      if (!mounted) return;
-      setState(() {
-        _categories = categories;
-        _selectedCategoryId = categories.isEmpty ? null : categories.first.categoryId;
-        _error = null;
-      });
-    } on Object catch (error) {
-      if (!mounted) return;
-      setState(() => _error = error);
+  void _selectDefault(List<Category> categories) {
+    if (_selectedCategoryId == null && categories.isNotEmpty) {
+      _selectedCategoryId = categories.first.categoryId;
     }
-  }
-
-  List<Widget> _getScrollChilder() {
-    final topPadding = MediaQuery.paddingOf(context).top;
-
-    return [
-      SliverPersistentHeader(
-        pinned: true,
-        delegate: HmAppbar(
-          topPadding: topPadding,
-          title: '电梯工具手册集',
-          onAccount: widget.onAccountTap,
-        ),
-      ),
-      SliverPersistentHeader(
-        pinned: true,
-        delegate: _HmCategoryDelegate(
-          categories: _categories,
-          selectedCategoryId: _selectedCategoryId,
-          onSelected: (categoryId) =>
-              setState(() => _selectedCategoryId = categoryId),
-        ),
-      ),
-      const SliverToBoxAdapter(child: SizedBox(height: 10)),
-      if (_error != null)
-        SliverToBoxAdapter(
-          child: _ErrorRetry(
-            message: '$_error',
-            onRetry: _loadCategories,
-          ),
-        )
-      else
-        HmWidget(categoryId: _selectedCategoryId),
-    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    return CustomScrollView(slivers: _getScrollChilder());
+    final categoriesAsync = ref.watch(categoriesProvider);
+    // 首页只展示 4 个设备品牌分类，锦囊妙计放到底部导航。
+    final categories = (categoriesAsync.value ?? const <Category>[])
+        .where((c) => c.categoryId != _tipsCategoryId)
+        .toList(growable: false);
+    _selectDefault(categories);
+
+    return CustomScrollView(
+      slivers: [
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: HmAppbar(
+            topPadding: MediaQuery.paddingOf(context).top,
+            title: '电梯工具手册集',
+            onAccount: widget.onAccountTap,
+          ),
+        ),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _HmCategoryDelegate(
+            categories: categories,
+            selectedCategoryId: _selectedCategoryId,
+            onSelected: (categoryId) =>
+                setState(() => _selectedCategoryId = categoryId),
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 10)),
+        categoriesAsync.when(
+          loading: () => const SliverToBoxAdapter(
+            child: Padding(
+              padding: EdgeInsets.all(32),
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ),
+          error: (error, _) => SliverToBoxAdapter(
+            child: _ErrorRetry(
+              message: '$error',
+              onRetry: () => ref.invalidate(categoriesProvider),
+            ),
+          ),
+          data: (_) => HmWidget(categoryId: _selectedCategoryId),
+        ),
+      ],
+    );
   }
 }
 

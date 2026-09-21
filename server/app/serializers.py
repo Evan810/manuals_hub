@@ -17,8 +17,10 @@ def escape_like(value: str) -> str:
 # ---------- 分类下的手册列表 ----------
 
 def serialize_manual_list(row: sqlite3.Row) -> dict:
+    """row 必须包含 category_id 字段（manuals 表查询自带）。"""
     icon = row["icon"] or ""
     keys = row.keys()
+    category_id = str(row["category_id"])
     return {
         "manual_id": row["id"],
         "title": row["title"],
@@ -26,26 +28,28 @@ def serialize_manual_list(row: sqlite3.Row) -> dict:
         "category": row["category"],
         "icon": icon,
         "entry": row["entry"],
-        "entry_url": file_url("manuals", row["path"], row["entry"]),
+        "entry_url": file_url(category_id, row["path"], row["entry"]),
         "chapter_count": (
             row["chapter_count"] if "chapter_count" in keys else 0
         ),
         "size": row["size"] if "size" in keys else 0,
+        "bundled": bool(row["bundled"]) if "bundled" in keys else False,
     }
 
 
 # ---------- API 2：章节列表 ----------
 
-def serialize_chapter(row: sqlite3.Row, manual_path: str) -> dict:
+def serialize_chapter(row: sqlite3.Row, manual_path: str, category_id: int) -> dict:
+    cat = str(category_id)
     is_reader = row["page_start"] is not None
 
     if is_reader:
         entry_url = (
-            file_url("manuals", manual_path, "reader.html")
+            file_url(cat, manual_path, "reader.html")
             + f'#p{row["page_start"]}'
         )
     elif row["html_path"]:
-        entry_url = file_url("manuals", manual_path, row["html_path"])
+        entry_url = file_url(cat, manual_path, row["html_path"])
     else:
         entry_url = None
 
@@ -63,12 +67,13 @@ def serialize_chapter(row: sqlite3.Row, manual_path: str) -> dict:
 
 # ---------- API 3：章节图片 ----------
 
-def serialize_image(row: sqlite3.Row, manual_path: str) -> dict:
+def serialize_image(row: sqlite3.Row, manual_path: str, category_id: int) -> dict:
+    cat = str(category_id)
     image_path = row["image_path"]
     return {
         "sort_order": row["sort_order"],
         "path": image_path,
-        "url": file_url("manuals", manual_path, image_path),
+        "url": file_url(cat, manual_path, image_path),
     }
 
 
@@ -83,27 +88,32 @@ def serialize_brand(row: sqlite3.Row) -> dict:
 
 
 def serialize_manual_search(row: sqlite3.Row) -> dict:
+    """row 必须包含 category_id 字段（manuals 表查询自带）。"""
     icon = row["icon"] or ""
+    category_id = str(row["category_id"])
     return {
         "manual_id": row["id"],
         "title": row["title"],
         "category": row["category"],
         "category_id": row["category_id"],
         "icon": icon,
-        "entry_url": file_url("manuals", row["path"], row["entry"]),
+        "entry_url": file_url(category_id, row["path"], row["entry"]),
+        "bundled": bool(row["bundled"]) if "bundled" in row.keys() else False,
     }
 
 
 def serialize_chapter_search(row: sqlite3.Row) -> dict:
+    """row 来自 v_chapter_search 视图，已包含 manual_category_id 列。"""
     manual_path = row["manual_path"]
+    cat = str(row["manual_category_id"])
     page_start = row["page_start"]
 
     if page_start is not None:
         entry_url = (
-            file_url("manuals", manual_path, "reader.html") + f"#p{page_start}"
+            file_url(cat, manual_path, "reader.html") + f"#p{page_start}"
         )
     elif row["html_path"]:
-        entry_url = file_url("manuals", manual_path, row["html_path"])
+        entry_url = file_url(cat, manual_path, row["html_path"])
     else:
         entry_url = None
 
