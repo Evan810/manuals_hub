@@ -26,6 +26,44 @@ class AppColors {
   /// 功能菜单主卡片 渐变起始（更亮的紫色）
   static const Color featureCardPurpleLight = Color(0xFF7C3AED);
 
+  /// 登录/注册页共享的颜色与尺寸常量（依据即时设计画布 375x812）。
+
+  /// 主标题 / 协议文字：浅 #333，深模式用主题主文字色。
+  static const titleLight = Color(0xFF333333);
+
+  /// 副标题 / 占位符：#aaaaaa
+  static const hint = Color(0xFFAAAAAA);
+
+  /// 次要链接（验证码登录 / 忘记密码 / 立即注册）：#666666
+  static const link = Color(0xFF666666);
+
+  /// "其他登录方式" 文字：#999999
+  static const subLabel = Color(0xFF999999);
+
+  /// 分割线：#e6e6e6
+  static const divider = Color(0xFFE6E6E6);
+
+  /// 输入框边框：#979797（默认不可见，聚焦时显示）
+  static const inputBorder = Color(0xFF979797);
+
+  /// 主按钮背景：未激活时浅模式 rgba(0,0,0,0.4)；深模式用 rgba(255,255,255,0.15)。
+  static Color primaryButton(Brightness brightness) =>
+      brightness == Brightness.dark
+          ? const Color(0x26FFFFFF)
+          : const Color(0x66000000);
+
+  /// 主按钮背景（激活态）：浅模式 #000000；深模式 #ffffff。
+  static Color primaryButtonActive(Brightness brightness) =>
+      brightness == Brightness.dark
+          ? Colors.white
+          : const Color(0xFF2F73F1);
+          // : Colors.black;
+
+  // static Color logoutButton(Brightness brightness) =>
+  //     brightness == Brightness.dark 
+  //         ? const Color(0xFF790B0B)
+  //         : const Color(0xFFC2170B);
+
   // ==================== 菜单项图标色（每项独立，浅深通用） ====================
 
   /// 电梯状态 - 琥珀橙
@@ -57,7 +95,7 @@ class AppColors {
   /// 紫色卡片上的文字（白色）
   static const Color textOnDark = Color(0xFFFFFFFF);
 
-  /// 成功/确认绿色
+  /// 成功/确认绿色AppColors
   static const Color success = Color(0xFF10B981);
 
   /// 警告黄色

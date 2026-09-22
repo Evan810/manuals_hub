@@ -22,7 +22,7 @@ class HmCategory extends StatelessWidget {
       width: double.infinity,
       height: 40,
       decoration: BoxDecoration(color: cardColor),
-      padding: const EdgeInsets.only(top: 10, left: 10, right: 10, bottom: 2),
+      padding: const EdgeInsets.only(top: 10, left: 14, bottom: 2),
       // 4 个分类在导航栏内动态平分宽度，不再横向滚动。
       child: Row(
         children: [
@@ -73,7 +73,7 @@ class _CategoryChip extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
             style: TextStyle(
-              fontSize: 15,
+              fontSize: 14,
               fontWeight: FontWeight.w600,
               color: selected
                   ? Colors.white

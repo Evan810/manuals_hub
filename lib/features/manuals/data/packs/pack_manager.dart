@@ -329,29 +329,11 @@ class PackManager extends ChangeNotifier {
     }
     await staging.create(recursive: true);
 
-    final input = InputFileStream(zipPath);
     try {
-      final archive = ZipDecoder().decodeBuffer(input);
-      for (final entry in archive) {
-        final name = entry.name;
-        if (_isUnsafeEntry(name)) {
-          throw PackException('资源包包含非法路径: $name');
-        }
-        final outPath = p.join(staging.path, name);
-        if (entry.isFile) {
-          Directory(p.dirname(outPath)).createSync(recursive: true);
-          final output = OutputFileStream(outPath);
-          try {
-            entry.writeContent(output, freeMemory: true);
-          } finally {
-            output.close();
-          }
-        } else {
-          Directory(outPath).createSync(recursive: true);
-        }
-      }
-    } finally {
-      input.close();
+      extractZipToDirectory(zipPath, staging);
+    } catch (_) {
+      staging.deleteSync(recursive: true);
+      rethrow;
     }
 
     final entryFile = File(p.join(staging.path, info.entry));
@@ -443,12 +425,6 @@ class PackManager extends ChangeNotifier {
     return '下载失败：$error';
   }
 
-  bool _isUnsafeEntry(String name) {
-    if (p.isAbsolute(name)) return true;
-    // zip 内条目必须是相对路径，任何层级出现 ".." 都视为 zip-slip 攻击/坏包。
-    return p.split(name).contains('..');
-  }
-
   bool _isWithin(String root, String candidate) {
     final normalizedRoot = p.normalize(root);
     final normalizedCandidate = p.normalize(candidate);
@@ -473,4 +449,54 @@ class PackException implements Exception {
 
   @override
   String toString() => message;
+}
+
+/// 流式解压 zip 到 [target] 目录（zip 根即目录内容）。
+///
+/// archive 3.6.1 的 ArchiveFile 封装对 zip 条目不可直接使用：
+/// - `entry.decompress(output)` 是 no-op：ZipFile 继承 FileContent，
+///   ArchiveFile._content 恒非 null，decompress 的 `_content == null`
+///   守卫永不成立，会静默写出 0 字节文件；
+/// - `entry.writeContent(output)` 会先调 ZipFile.content 把整个文件
+///   解压进内存，数百 MB 的包会 Out of Memory。
+///
+/// 因此绕过封装，直接对压缩数据流 `entry.rawContent` 解压：DEFLATE 走
+/// Inflate.stream（流式），STORE 走 writeInputStream（内部 1MB 分块
+/// 复制），全程不把单个条目完整读入内存。
+void extractZipToDirectory(String zipPath, Directory target) {
+  final input = InputFileStream(zipPath);
+  try {
+    final archive = ZipDecoder().decodeBuffer(input);
+    for (final entry in archive) {
+      final name = entry.name;
+      // zip 内条目必须是相对路径，任何层级出现 ".." 都视为 zip-slip 攻击/坏包。
+      if (p.isAbsolute(name) || p.split(name).contains('..')) {
+        throw PackException('资源包包含非法路径: $name');
+      }
+      final outPath = p.join(target.path, name);
+      if (entry.isFile) {
+        Directory(p.dirname(outPath)).createSync(recursive: true);
+        final output = OutputFileStream(outPath);
+        try {
+          final raw = entry.rawContent;
+          if (raw == null) {
+            throw PackException('资源包条目缺少数据: $name');
+          }
+          if (entry.compressionType == ArchiveFile.DEFLATE) {
+            Inflate.stream(raw, output);
+          } else {
+            output.writeInputStream(raw);
+          }
+        } finally {
+          output.close();
+        }
+      } else {
+        Directory(outPath).createSync(recursive: true);
+      }
+    }
+    // 所有 entry 的 rawContent 共享同一个 FileBuffer，循环结束后统一释放。
+    archive.clear();
+  } finally {
+    input.close();
+  }
 }

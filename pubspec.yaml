@@ -39,6 +39,8 @@ flutter:
     - assets/catalog.json
     - assets/Manuals.db
     - assets/icons/
+    - assets/design/
+    - assets/design/icons/
     - assets/0/hge/
     - assets/0/hge/html/
     - assets/0/hge/html/001/
@@ -111,3 +113,21 @@ flutter:
     - assets/4/elevator_toolbox/html/css/images/
     - assets/4/elevator_toolbox/html/img/
     - assets/4/elevator_toolbox/html/js/
+    - assets/4/elevator_util/
+    - assets/4/elevator_util/html/
+    - assets/4/elevator_util/html/001/
+    - assets/4/elevator_util/html/001/pages/
+    - assets/4/elevator_util/html/002/
+    - assets/4/elevator_util/html/002/pages/
+    - assets/4/elevator_util/html/003/
+    - assets/4/elevator_util/html/003/pages/
+    - assets/4/elevator_util/html/004/
+    - assets/4/elevator_util/html/004/pages/
+    - assets/4/elevator_util/html/005/
+    - assets/4/elevator_util/html/005/pages/
+    - assets/4/elevator_util/html/006/
+    - assets/4/elevator_util/html/006/pages/
+    - assets/4/elevator_util/html/css/
+    - assets/4/elevator_util/html/css/images/
+    - assets/4/elevator_util/html/img/
+    - assets/4/elevator_util/html/js/

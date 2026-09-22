@@ -4,3 +4,6 @@ export 'views/account/account_settings_page.dart';
 export 'views/account/account_info_page.dart';
 export 'views/packages.dart';
 export 'views/tools.dart';
+export 'models/user/login_page.dart';
+export 'models/user/login_code_page.dart';
+export 'models/user/register_page.dart';

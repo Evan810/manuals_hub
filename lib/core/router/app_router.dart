@@ -123,6 +123,21 @@ GoRouter appRouter(Ref ref) {
           body: 'Manuals Hub 是一个用于整理和查阅设备手册的工具，帮助你更快找到章节、关键词和常用操作。当前版本 0.1.0。',
         ),
       ),
+
+      GoRoute(
+        path: AppRoutes.login,
+        builder: (_, _) => const LoginPage(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.loginCode,
+        builder: (_, _) => const LoginCodePage(),
+      ),
+
+      GoRoute(
+        path: AppRoutes.register,
+        builder: (_, _) => const RegisterPage(),
+      ),
     ],
   );
 }

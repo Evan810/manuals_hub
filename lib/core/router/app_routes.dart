@@ -33,6 +33,11 @@ class AppRoutes {
   static const disclaimer = "/account/disclaimer";
   static const about = "/account/about";
 
+  // 用户认证页面。
+  static const login = "/user/login";
+  static const loginCode = "/user/login-code";
+  static const register = "/user/register";
+
   /// 某手册章节目录路径。
   static String chaptersPath(String id, {String? title}) {
     return Uri(

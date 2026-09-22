@@ -84,7 +84,7 @@ class AccountPage extends ConsumerWidget {
         Padding(
           padding: const EdgeInsets.fromLTRB(20, 18, 20, 30),
           child: Text(
-            'Manuals Hub  ·  让知识更容易被找到',
+            'ElevatorTools·  让电梯维修更容易',
             textAlign: TextAlign.center,
             style: theme.textTheme.bodySmall,
           ),
@@ -96,27 +96,8 @@ class AccountPage extends ConsumerWidget {
   Future<void> _showLoginDialog(BuildContext context, WidgetRef ref) async {
     if (ref.read(accountProvider).isLoggedIn) return;
 
-    // 当前使用模拟登录，后续可在此处接入真实认证流程。
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('登录/注册'),
-        content: const Text('登录后可以同步收藏、阅读进度和个人资料。'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('稍后'),
-          ),
-          FilledButton(
-            onPressed: () {
-              ref.read(accountProvider.notifier).signIn();
-              Navigator.pop(dialogContext);
-            },
-            child: const Text('模拟登录'),
-          ),
-        ],
-      ),
-    );
+    // 跳转到独立的登录页，登录状态由 accountProvider 统一管理。
+    context.push(AppRoutes.login);
   }
 
   void _showMessage(BuildContext context, String message) {
